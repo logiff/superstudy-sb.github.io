@@ -1,5 +1,51 @@
+function isTouchDevice() {
+    return window.matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+}
+
+function applyTouchGameHints() {
+    if (!isTouchDevice()) return;
+
+    const hint = document.getElementById('ipad-touch-hint');
+    if (hint) return;
+
+    const banner = document.createElement('div');
+    banner.id = 'ipad-touch-hint';
+    banner.textContent = 'Touch device detected. Games will open directly for better iPad compatibility. Some keyboard-only games may still need on-screen controls.';
+    banner.style.position = 'sticky';
+    banner.style.top = '0';
+    banner.style.zIndex = '1500';
+    banner.style.margin = '10px auto';
+    banner.style.width = 'min(92vw, 900px)';
+    banner.style.padding = '12px 16px';
+    banner.style.borderRadius = '12px';
+    banner.style.background = 'rgba(0,0,0,0.75)';
+    banner.style.color = 'white';
+    banner.style.textAlign = 'center';
+    banner.style.fontSize = '14px';
+    banner.style.backdropFilter = 'blur(8px)';
+
+    const target = document.getElementById('desc');
+    if (target && target.parentNode) {
+        target.parentNode.insertBefore(banner, target.nextSibling);
+    }
+}
+
+function configureGameLink(link, item) {
+    if (!isTouchDevice()) return;
+
+    link.setAttribute('target', '_self');
+    link.setAttribute('rel', 'noopener');
+
+    link.addEventListener('click', function () {
+        sessionStorage.setItem('lastPlayedGame', item.name);
+        sessionStorage.setItem('lastPlayedUrl', item.url);
+    }, { passive: true });
+}
+
 function renderList(sort_type) {
-    document.getElementById("loader").style.display = "block";
+    const loader = document.getElementById("loader");
+    if (loader) loader.style.display = "block";
+
     let container = null;
     document.getElementById("itembox").textContent = '';
     document.getElementById("category-container").textContent = '';
@@ -59,10 +105,12 @@ function renderList(sort_type) {
                 listItem.innerHTML = `
                     <div class="card_margin">
                         <div class="col zoom-effect">
-                            <img src="${item.img}" class="img-fluid grid-img img-hover-shadow" style="border-radius: 1vw;" alt="Image">
+                            <img src="${item.img}" class="img-fluid grid-img img-hover-shadow" style="border-radius: 1vw;" alt="${item.name}">
                             <p class="text-center listing-text">${item.name}</p>
                         </div>
                     </div>`;
+
+                configureGameLink(listItem, item);
 
                 const img = listItem.querySelector("img");
                 img.loading = "lazy";
@@ -82,14 +130,16 @@ function renderList(sort_type) {
         })
         .catch(error => console.error("Error:", error))
         .finally(() => {
-            document.getElementById("loader").style.display = "none";
+            if (loader) loader.style.display = "none";
         });
 }
 
 document.addEventListener('DOMContentLoaded', function () {
     renderList(JSON.parse(localStorage.getItem("sort_type")) ? 'category' : 'name');
+    applyTouchGameHints();
 
-    document.getElementById("loader").style.display = "none";
+    const loader = document.getElementById("loader");
+    if (loader) loader.style.display = "none";
 
     setTimeout(() => {
         document.body.classList.add("page-ready");
