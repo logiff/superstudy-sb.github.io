@@ -30,16 +30,23 @@ function applyTouchGameHints() {
     }
 }
 
+function openGameWithHome(url) {
+    window.location.href = url;
+
+    setTimeout(() => {
+        try {
+            const script = document.createElement('script');
+            script.src = '/assets/js/game-home-button.js';
+            document.body.appendChild(script);
+        } catch (e) {}
+    }, 500);
+}
+
 function configureGameLink(link, item) {
-    if (!isTouchDevice()) return;
-
-    link.setAttribute('target', '_self');
-    link.setAttribute('rel', 'noopener');
-
-    link.addEventListener('click', function () {
-        sessionStorage.setItem('lastPlayedGame', item.name);
-        sessionStorage.setItem('lastPlayedUrl', item.url);
-    }, { passive: true });
+    link.addEventListener('click', function (e) {
+        e.preventDefault();
+        openGameWithHome(item.url);
+    });
 }
 
 function renderList(sort_type) {
