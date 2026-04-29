@@ -1,5 +1,10 @@
 function isTouchDevice() {
-    return window.matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const hasTouch = navigator.maxTouchPoints > 0 || window.matchMedia('(pointer: coarse)').matches;
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    const isMobileOrTablet = /Android|iPhone|iPad|iPod|Mobile|Tablet/i.test(userAgent) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+    return hasTouch && isMobileOrTablet;
 }
 
 function applyTouchGameHints() {
@@ -43,10 +48,12 @@ function openGameWithHome(url) {
 }
 
 function configureGameLink(link, item) {
-    link.addEventListener('click', function (e) {
-        e.preventDefault();
-        openGameWithHome(item.url);
-    });
+    if (isTouchDevice()) {
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+            openGameWithHome(item.url);
+        });
+    }
 }
 
 function renderList(sort_type) {
