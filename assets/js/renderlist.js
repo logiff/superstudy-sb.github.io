@@ -1,11 +1,17 @@
-function isTouchDevice() {
-    const hasTouch = navigator.maxTouchPoints > 0 || window.matchMedia('(pointer: coarse)').matches;
-    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-    const isMobileOrTablet = /Android|iPhone|iPad|iPod|Mobile|Tablet/i.test(userAgent) ||
-        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-
-    return hasTouch && isMobileOrTablet;
+function hasKeyboardOrMouseInput() {
+    return window.matchMedia('(any-pointer: fine)').matches ||
+        window.matchMedia('(hover: hover)').matches ||
+        localStorage.getItem('hasKeyboardInput') === 'true';
 }
+
+function isTouchDevice() {
+    const hasTouch = navigator.maxTouchPoints > 0 || window.matchMedia('(any-pointer: coarse)').matches;
+    return hasTouch && !hasKeyboardOrMouseInput();
+}
+
+document.addEventListener('keydown', function () {
+    localStorage.setItem('hasKeyboardInput', 'true');
+}, { once: true });
 
 function applyTouchGameHints() {
     if (!isTouchDevice()) return;
@@ -15,7 +21,7 @@ function applyTouchGameHints() {
 
     const banner = document.createElement('div');
     banner.id = 'ipad-touch-hint';
-    banner.textContent = 'Touch device detected. Games will open directly for better iPad compatibility. Some keyboard-only games may still need on-screen controls.';
+    banner.textContent = 'Touch device detected. Games will open directly for better touch compatibility. Some keyboard-only games may still need on-screen controls.';
     banner.style.position = 'sticky';
     banner.style.top = '0';
     banner.style.zIndex = '1500';
