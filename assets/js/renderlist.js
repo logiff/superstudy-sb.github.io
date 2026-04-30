@@ -14,31 +14,7 @@ document.addEventListener('keydown', function () {
 }, { once: true });
 
 function applyTouchGameHints() {
-    if (!isTouchDevice()) return;
-
-    const hint = document.getElementById('ipad-touch-hint');
-    if (hint) return;
-
-    const banner = document.createElement('div');
-    banner.id = 'ipad-touch-hint';
-    banner.textContent = 'Touch device detected. Games will open directly for better touch compatibility. Some keyboard-only games may still need on-screen controls.';
-    banner.style.position = 'sticky';
-    banner.style.top = '0';
-    banner.style.zIndex = '1500';
-    banner.style.margin = '10px auto';
-    banner.style.width = 'min(92vw, 900px)';
-    banner.style.padding = '12px 16px';
-    banner.style.borderRadius = '12px';
-    banner.style.background = 'rgba(0,0,0,0.75)';
-    banner.style.color = 'white';
-    banner.style.textAlign = 'center';
-    banner.style.fontSize = '14px';
-    banner.style.backdropFilter = 'blur(8px)';
-
-    const target = document.getElementById('desc');
-    if (target && target.parentNode) {
-        target.parentNode.insertBefore(banner, target.nextSibling);
-    }
+    return;
 }
 
 function openGameWithHome(url) {
