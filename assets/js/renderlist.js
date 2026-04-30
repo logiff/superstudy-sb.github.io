@@ -17,6 +17,38 @@ function applyTouchGameHints() {
     return;
 }
 
+async function refreshStatusText() {
+    const desc = document.getElementById('desc');
+    if (!desc) return;
+
+    const fallbackWords = [
+        'Are you sure about that?',
+        'We are going to need a bigger boat.',
+        'If you came here for a study guide, you should leave.',
+        'Definitely not clickbait!',
+        "Have you done your homework? Didn't think so.",
+        'Yep, you found it.',
+        'Made in England!',
+        'You can submit ideas in the Q/A page!',
+        'Always listening...',
+        "We're back! Did you miss us?",
+        'Now with tab cloaker!',
+        'JustNotStudying'
+    ];
+
+    try {
+        const response = await fetch(`assets/data/statusWords.json?v=${Date.now()}`, { cache: 'no-store' });
+        if (!response.ok) throw new Error('Failed to load status words');
+
+        const words = await response.json();
+        const safeWords = words.filter(word => !word.includes('for all the people saying i did not make this'));
+        const array = safeWords.length ? safeWords : fallbackWords;
+        desc.textContent = array[Math.floor(Math.random() * array.length)];
+    } catch (error) {
+        desc.textContent = fallbackWords[Math.floor(Math.random() * fallbackWords.length)];
+    }
+}
+
 function openGameWithHome(url) {
     window.location.href = url;
 
@@ -133,6 +165,7 @@ function renderList(sort_type) {
 document.addEventListener('DOMContentLoaded', function () {
     renderList(JSON.parse(localStorage.getItem("sort_type")) ? 'category' : 'name');
     applyTouchGameHints();
+    refreshStatusText();
 
     const loader = document.getElementById("loader");
     if (loader) loader.style.display = "none";
